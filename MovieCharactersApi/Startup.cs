@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -9,7 +10,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using MovieCharactersApi.Database;
-using MovieCharactersApi.SeedData;
+using MovieCharactersApi.MappingProfiles;
+using MovieCharactersApi.Service;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,8 +44,14 @@ namespace MovieCharactersApi
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "MovieCharactersApi", Version = "v1" });
             });
 
-            services.AddScoped<ISeedService, SeedService>(); //zrozumiec
-            
+            services.AddScoped<IMovieService, MovieService>();
+            var mapperConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new MappingProfile());
+            });
+            IMapper mapper = mapperConfig.CreateMapper();
+            services.AddSingleton(mapper);
+
         }
 
   

@@ -10,8 +10,8 @@ using MovieCharactersApi.Database;
 namespace MovieCharactersApi.Migrations
 {
     [DbContext(typeof(MovieCharacterContext))]
-    [Migration("20211126155002_CreateDB")]
-    partial class CreateDB
+    [Migration("20211207121643_createDb")]
+    partial class createDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

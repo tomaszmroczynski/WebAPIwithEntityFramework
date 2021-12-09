@@ -1,27 +1,32 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using MovieCharactersApi.SeedData;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MovieCharactersApi.Database;
+using MovieCharactersApi.Models;
+using MovieCharactersApi.Service;
 
 namespace MovieCharactersApi.Controllers
 {
+
     [ApiController]
-    [Route("createdata")]
     public class SeedController : ControllerBase
     {
-        private readonly ISeedService _service;
+        private readonly IMovieService _service;
 
-        public SeedController(ISeedService service)
-        {           
+        public SeedController(IMovieService service)
+        {
             _service = service;
         }
 
-        [HttpGet]
-        public async Task<string> CreateData()
+        [HttpPost]
+        [Route("seed")]
+        public async Task<string> SeedDataAsync()
         {
-            await _service.SeedCharacters();
+            await _service.SeedData();
             return "data has been created";
         }
     }

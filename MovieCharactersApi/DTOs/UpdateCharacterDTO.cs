@@ -1,15 +1,13 @@
-﻿using MovieCharactersApi.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace MovieCharactersApi.DTOs
 {
-    public class CharacterDTO
-    {     
+    public class UpdateCharacterDTO
+    {
         public int Id { get; set; }
-
         public string FullName { get; set; }
 
         public string Alias { get; set; }
@@ -18,6 +16,7 @@ namespace MovieCharactersApi.DTOs
 
         public string Picture { get; set; }
 
-        public ICollection<MovieDTO> MovieList { get; set; }
+        public List<int> MovieIdList { get; set; }
+
     }
 }
