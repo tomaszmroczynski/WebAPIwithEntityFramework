@@ -13,11 +13,11 @@ namespace MovieCharactersApi.Controllers
 {
 
     [ApiController]
-    public class SeedController : ControllerBase
+    public class VariableActionsController : ControllerBase
     {
         private readonly IMovieService _service;
 
-        public SeedController(IMovieService service)
+        public VariableActionsController(IMovieService service)
         {
             _service = service;
         }

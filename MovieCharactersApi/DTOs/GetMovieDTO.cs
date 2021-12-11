@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 
 namespace MovieCharactersApi.DTOs
 {
-    public class MovieDTO
+    public class GetMovieDTO
     {
-        public int Id { get; set; }
 
         public string MovieTitle { get; set; }
 
@@ -20,8 +19,6 @@ namespace MovieCharactersApi.DTOs
         public string Picture { get; set; }
 
         public string Trailer { get; set; }
-
-       
-
+        public ICollection<CharacterDTO> CharacterList { get; set; }
     }
 }

@@ -64,6 +64,8 @@ namespace MovieCharactersApi
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MovieCharactersApi v1"));
             }
 
+            
+
             app.UseHttpsRedirection();
 
             app.UseRouting();

@@ -10,23 +10,27 @@ namespace MovieCharactersApi.Service
     public interface IMovieService
     {
         Task SeedData();
-        Task<IEnumerable<CharacterDTO>> GetCharacters();
-        Task<IEnumerable<MovieDTO>> GetMovies();
-        Task<IEnumerable<FranchiseDTO>> GetFranchises();
-        Task<CharacterDTO> GetCharacterById(int id);
-        Task<MovieDTO> GetMovieById(int id);
+        Task<IEnumerable<Character>> GetCharacters();
+        Task<IEnumerable<Movie>> GetMovies();
+        Task<IEnumerable<Franchise>> GetFranchises();
+        Task<Character> GetCharacterById(int id);
+        Task<Movie> GetMovieById(int id);
 
-        Task<FranchiseDTO> GetFranchiseById(int id);
-        Task<Character> CreateCharacter(CreateCharacterDTO characterDTO);
+        Task<Franchise> GetFranchiseById(int id);
+        Task<Character> CreateCharacter(Character character);
 
-        Task<Movie> CreateMovie(CreateMovieDTO CreateMovieDTO);
-        Task<Franchise> CreateFranchise(CreateFranchiseDTO CreateFranchiseDTO);
-        Task<string> UpdateCharacter(UpdateCharacterDTO updateCharacterDTO);
-        Task<string> UpdateMovie(UpdateMovieDTO updateMovieDTO);
-        Task<string> UpdateFranchise(UpdateFranchiseDTO updateFranchiseDTO);
-        Task<string> DeleteCharacter(int id);
-        Task<string> DeleteMovie(int id);
-        Task<string> DeleteFranchise(int id);
+        Task<Movie> CreateMovie(Movie movie);
+        Task<Franchise> CreateFranchise(Franchise franchise);
+        Task<Character> UpdateCharacter(Character character);
+        Task<Movie> UpdateMovie(Movie movie);
+        Task<Franchise> UpdateFranchise(Franchise franchise);
+
+        Task<string> UpdateCharactersInMovie(int movieId, int[] charactersId);
+
+        Task<string> UpdateMovieInFranchise(int franchiseId, int[] moviesId);
+        Task<bool> DeleteCharacter(int id);
+        Task<bool> DeleteMovie(int id);
+        Task<bool> DeleteFranchise(int id);
     }
 }
 

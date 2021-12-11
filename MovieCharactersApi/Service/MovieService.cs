@@ -21,11 +21,10 @@ namespace MovieCharactersApi.Service
             _context = context;
             _mapper = mapper;
         }
-        public async Task<Character> CreateCharacter(CreateCharacterDTO characterDTO)
+        public async Task<Character> CreateCharacter(Character character)
         {
             try
-            {
-                var character = MapDTOtoCharacter(characterDTO);
+            {               
                 await _context.AddAsync(character);
                 await _context.SaveChangesAsync();
                 return character;
@@ -36,11 +35,10 @@ namespace MovieCharactersApi.Service
             }          
         }
 
-        public async Task<Movie> CreateMovie(CreateMovieDTO createMovieDTO)
+        public async Task<Movie> CreateMovie(Movie movie)
         {
             try
             {
-                var movie = MapDTOtoMovie(createMovieDTO);
                 await _context.AddAsync(movie);
                 await _context.SaveChangesAsync();
                 return movie;
@@ -51,11 +49,11 @@ namespace MovieCharactersApi.Service
             }
         }
 
-        public async Task<Franchise> CreateFranchise(CreateFranchiseDTO dto)
+        public async Task<Franchise> CreateFranchise(Franchise franchise)
         {
             try
             {
-                var franchise = MapDTOtoFranchise(dto);
+  
                 await _context.AddAsync(franchise);
                 await _context.SaveChangesAsync();
                 return franchise;
@@ -66,83 +64,79 @@ namespace MovieCharactersApi.Service
             }
         }
 
-
-        public async Task<string> DeleteCharacter(int id)
+        public async Task<bool> DeleteCharacter(int id)
         {
             var character = await _context.Characters.SingleOrDefaultAsync(c => c.Id == id);
             if (character != null)
             {
                 _context.Characters.Remove(character);
                 await _context.SaveChangesAsync();
-                return "Character was deleted succesfully";
+                return true;
             }
             else
-                return "Character not found";
+                return false;
             
         }
 
-        public async Task<string> DeleteMovie(int id)
+        public async Task<bool> DeleteMovie(int id)
         {
             var movie = await _context.Movies.SingleOrDefaultAsync(c => c.Id == id);
             if (movie != null)
             {
                 _context.Movies.Remove(movie);
                 await _context.SaveChangesAsync();
-                return "Movie was deleted succesfully";
+                return true;
             }
             else
-                return "Movie not found";
+                return false;
 
         }
 
-        public async Task<string> DeleteFranchise(int id)
+        public async Task<bool> DeleteFranchise(int id)
         {
             var franchise = await _context.Franchises.SingleOrDefaultAsync(c => c.Id == id);
             if (franchise != null)
             {
                 _context.Franchises.Remove(franchise);
                 await _context.SaveChangesAsync();
-                return "Franchise was deleted succesfully";
+                return true;
             }
             else
-                return "Franchise not found";
+                return false;
 
         }
 
-        public async Task<CharacterDTO> GetCharacterById(int id)
+        public async Task<Character> GetCharacterById(int id)
         {
-            var character = await _context.Characters.Include(c => c.MovieList).FirstOrDefaultAsync(c => c.Id == id);
-            return  _mapper.Map<CharacterDTO>(character);
+            return await _context.Characters.Include(c => c.MovieList).FirstOrDefaultAsync(c => c.Id == id);          
         }
 
-        public async Task<MovieDTO> GetMovieById(int id)
+        public async Task<Movie> GetMovieById(int id)
         {
-            var movie = await _context.Movies.Include(c => c.CharacterList).FirstOrDefaultAsync(c => c.Id == id);
-            return _mapper.Map<MovieDTO>(movie);
+            return await _context.Movies.Include(c => c.CharacterList).FirstOrDefaultAsync(c => c.Id == id);
+            
         }
 
-        public async Task<FranchiseDTO> GetFranchiseById(int id)
+        public async Task<Franchise> GetFranchiseById(int id)
         {
-            var movie = await _context.Franchises.Include(c => c.MovieList).FirstOrDefaultAsync(c => c.Id == id);
-            return _mapper.Map<FranchiseDTO>(movie);
+            return await _context.Franchises.Include(c => c.MovieList).FirstOrDefaultAsync(c => c.Id == id);
+         
         }
 
 
-        public async Task<IEnumerable<CharacterDTO>> GetCharacters()
+        public async Task<IEnumerable<Character>> GetCharacters()
         {
-            return await _context.Characters.Include(c => c.MovieList)
-                .Select(c => _mapper.Map<CharacterDTO>(c)).ToListAsync();        
+            return await _context.Characters.Include(c => c.MovieList).ToListAsync();               
         }
 
-        public async Task<IEnumerable<MovieDTO>> GetMovies()
+        public async Task<IEnumerable<Movie>> GetMovies()
         {
-            return await _context.Movies.Include(c => c.CharacterList)
-                .Select(c => _mapper.Map<MovieDTO>(c)).ToListAsync();
+            return await _context.Movies.Include(c => c.CharacterList).ToListAsync();
         }
-        public async Task<IEnumerable<FranchiseDTO>> GetFranchises()
+        public async Task<IEnumerable<Franchise>> GetFranchises()
         {
-            return await _context.Franchises.Include(c => c.MovieList)
-                .Select(c => _mapper.Map<FranchiseDTO>(c)).ToListAsync();
+            return await _context.Franchises.Include(c => c.MovieList).ToListAsync();
+          
         }
 
         public async Task SeedData()
@@ -157,70 +151,100 @@ namespace MovieCharactersApi.Service
             await _context.SaveChangesAsync();
         }
 
-        public async Task<string> UpdateCharacter(UpdateCharacterDTO updateCharacterDTO)
+        public async Task<Character> UpdateCharacter(Character character)
         {
-            var character = await _context.Characters.SingleOrDefaultAsync(c => c.Id == updateCharacterDTO.Id);
-            if (character != null)
+            var characterFound = await _context.Characters.SingleOrDefaultAsync(c => c.Id == character.Id);
+
+            if (characterFound != null)
             {
-                character.FullName = updateCharacterDTO.FullName;
-                character.Alias = updateCharacterDTO.Alias;
-                character.Gender = updateCharacterDTO.Gender;
-                character.Picture = updateCharacterDTO.Picture;
-                if (updateCharacterDTO.MovieIdList.Any())
-                {
-                    character.MovieList = await _context.Movies.
-                        Where(x => updateCharacterDTO.MovieIdList.Contains(x.Id)).ToListAsync();
-                }
+                characterFound.FullName = character.FullName;
+                characterFound.Alias = character.Alias;
+                characterFound.Gender = character.Gender;
+                characterFound.Picture = character.Picture;
+                characterFound.MovieList = character.MovieList;
                 await _context.SaveChangesAsync();
-                return "Character was updated succesfully";
+                return characterFound;
             }
             else
-                return "Incorrect character Id";
+                return null;
         }
 
-        public async Task<string> UpdateMovie(UpdateMovieDTO dto)
+        public async Task<string> UpdateCharactersInMovie(int movieId, int[] charactersId)
         {
-            var movie = await _context.Movies.SingleOrDefaultAsync(c => c.Id == dto.Id);
+            
+            var movie = await _context.Movies.FirstOrDefaultAsync(c => c.Id == movieId);
             if (movie != null)
             {
-                movie.MovieTitle = dto.MovieTitle;
-                movie.Genre = dto.Genre;
-                movie.ReleaseYear = dto.ReleaseYear;
-                movie.Director = dto.Director;
-                movie.Picture = dto.Picture;
-                movie.Trailer = dto.Trailer;
-
-                if (dto.CharacterIdList.Any())
+                Character character = new Character();
+                foreach (var item in charactersId)
                 {
-                    movie.CharacterList = await _context.Characters.
-                        Where(x => dto.CharacterIdList.Contains(x.Id)).ToListAsync();
+                    character = await _context.Characters.FirstOrDefaultAsync(c => c.Id == item);
+                    if (!movie.CharacterList.Contains(character))
+                    {
+                        movie.CharacterList.Add(character);                       
+                    }
                 }
-                await _context.SaveChangesAsync();
-                return "Movie was updated succesfully";
-            }
+                return "characters was updated succesfully";
+            } 
             else
-                return "Incorrect movie Id";
+            {
+                return "incorrect movie id";
+            }
         }
 
-        public async Task<string> UpdateFranchise(UpdateFranchiseDTO dto)
+        public async Task<string> UpdateMovieInFranchise(int franchiseId, int[] moviesId)
         {
-            var franchise = await _context.Franchises.SingleOrDefaultAsync(c => c.Id == dto.Id);
+            var franchise = await _context.Franchises.FirstOrDefaultAsync(c => c.Id == franchiseId);
             if (franchise != null)
             {
-                franchise.Name = dto.Name;
-                franchise.Description = dto.Description;
-
-
-                if (dto.MovieIdList.Any())
+                Movie movie = new Movie();
+                foreach (var item in moviesId)
                 {
-                    franchise.MovieList = await _context.Movies.
-                        Where(x => dto.MovieIdList.Contains(x.Id)).ToListAsync();
+                    movie = await _context.Movies.FirstOrDefaultAsync(c => c.Id == item);
+                    if (!franchise.MovieList.Contains(movie))
+                    {
+                        franchise.MovieList.Add(movie);
+                    }
                 }
-                await _context.SaveChangesAsync();
-                return "Franchise was updated succesfully";
+                return "movies in franchise was updated succesfully";
             }
             else
-                return "Incorrect franchise Id";
+            {
+                return "incorrect franchise id";
+            }
+        }
+
+        public async Task<Movie> UpdateMovie(Movie movie)
+        {
+            var movieFound = await _context.Movies.SingleOrDefaultAsync(c => c.Id == movie.Id);
+            if (movieFound != null)
+            {
+                movieFound.MovieTitle = movie.MovieTitle;
+                movieFound.Genre = movie.Genre;
+                movieFound.ReleaseYear = movie.ReleaseYear;
+                movieFound.Director = movie.Director;
+                movieFound.Picture = movie.Picture;
+                movieFound.Trailer = movie.Trailer;
+                await _context.SaveChangesAsync();
+                return movieFound;
+            }
+            else
+                return null;
+        }
+
+        public async Task<Franchise> UpdateFranchise(Franchise franchise)
+        {
+            var franchiseFound = await _context.Franchises.SingleOrDefaultAsync(c => c.Id == franchise.Id);
+            if (franchiseFound != null)
+            {
+                franchiseFound.Name = franchise.Name;
+                franchiseFound.Description = franchise.Description;
+
+                await _context.SaveChangesAsync();
+                return franchiseFound;
+            }
+            else
+                return null;
         }
 
         private ICollection<Character> CreateStartCharacters() 
@@ -274,7 +298,6 @@ namespace MovieCharactersApi.Service
                 }
             };       
         }
-
         private ICollection<Movie> CreateMovies()
         {
             return new List<Movie>
@@ -307,54 +330,6 @@ namespace MovieCharactersApi.Service
                     Trailer = "https://www.youtube.com/watch?v=TYMMOjBUPMM"
                 }
             };
-        }
-
-        private Character MapDTOtoCharacter(CreateCharacterDTO dto)
-        {
-            var character = new Character
-            {
-                FullName = dto.FullName,
-                Alias = dto.Alias,
-                Gender = dto.Gender,
-                Picture = dto.Picture
-            };
-
-            var movies = _context.Movies.Where(x => dto.MovieIdList.Contains(x.Id));
-            character.MovieList = movies.ToList();
-            return character;
-        }
-
-        private Movie MapDTOtoMovie(CreateMovieDTO dto)
-        {
-
-        var movie = new Movie
-            {
-                MovieTitle = dto.MovieTitle,
-                Genre = dto.Genre,
-                ReleaseYear = dto.ReleaseYear,
-                Director = dto.Director,
-                Picture = dto.Picture,
-                Trailer = dto.Trailer
-        };
-
-            var characters = _context.Characters.Where(x => dto.CharacterIdList.Contains(x.Id));
-            movie.CharacterList = characters.ToList();
-            return movie;
-        }
-
-        private Franchise MapDTOtoFranchise(CreateFranchiseDTO dto)
-        {
-
-            var franchise = new Franchise
-            {
-                Name = dto.Name,
-                Description = dto.Description,
-
-            };
-
-            var movies = _context.Movies.Where(x => dto.MovieIdList.Contains(x.Id));
-            franchise.MovieList = movies.ToList();
-            return franchise;
-        }
+        }     
     }
 }
