@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace MovieCharactersApi.Models
 {
+    /// <summary>
+    /// A class that contains character database model
+    /// </summary>
     public class Character
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]

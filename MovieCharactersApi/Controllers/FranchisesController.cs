@@ -29,7 +29,10 @@ namespace MovieCharactersApi.Controllers
             _context = context;
         }
 
-
+        /// <summary>
+        /// A controller that returns all franchises in database
+        /// </summary>
+        /// <returns>All franchises</returns>
         [HttpGet]
         [Route("getfranchises")]
         public async Task<IEnumerable<FranchiseDTO>> GetFranchisesAsync()
@@ -39,15 +42,19 @@ namespace MovieCharactersApi.Controllers
             return franchiseList.Select(x => _mapper.Map<FranchiseDTO>(x));
 
         }
-
+        /// <summary>
+        /// A controller that returns franchise by selected id
+        /// </summary>
+        /// <param name="id">Franchise id to be shown</param>
+        /// <returns>Franchise</returns>
         [HttpGet]
         [Route("getfranchisebyid")]
-        public async Task<IActionResult> GetFranchiseAsync([FromQuery] string id)
+        public async Task<IActionResult> GetFranchiseAsync([FromQuery] int id)
         {
-            bool correctId = int.TryParse(id, out int number);
-            if (correctId)
+            var franchise = await _service.GetFranchiseById(id);
+            if (franchise != null)
             {
-                var franchise = await _service.GetFranchiseById(number);
+                
                 using (ManualMapping mapping = new ManualMapping(_context, _mapper))
                 {
                     var franchiseDTO = mapping.MapFranchiseToDTO(franchise);
@@ -57,7 +64,11 @@ namespace MovieCharactersApi.Controllers
             else
                 return NotFound();
         }
-
+        /// <summary>
+        /// A controller that create franchise instance in database
+        /// </summary>
+        /// <param name="createFranchiseDTO">Data transfer object representation of franchise instance </param>
+        /// <returns>Franchise created report</returns>
         [HttpPost]
         [Route("createfranchise")]
         public async Task<IActionResult> CreateFranchise(CreateFranchiseDTO createFranchiseDTO)
@@ -70,12 +81,16 @@ namespace MovieCharactersApi.Controllers
             var createdFranchise = await _service.CreateFranchise(franchise);
 
             if (createdFranchise != null)
-                return Created(new Uri($"{Request.Path}/{createdFranchise.Id}"), createdFranchise);
+                return Ok("Franchise was created");
             else
                 return NotFound();
         }
-    
 
+        /// <summary>
+        /// A controller that updatdes franchise in database
+        /// </summary>
+        /// <param name="updateFranchiseDTO">Data transfer object representation of franchise instance </param>
+        /// <returns>Updating report</returns>
         [HttpPut]
         [Route("updatefranchise")]
         public async Task<IActionResult> UpdateFranchiseAsync(UpdateFranchiseDTO updateFranchiseDTO)
@@ -111,20 +126,18 @@ namespace MovieCharactersApi.Controllers
             }
             return Ok();
         }
-
+        /// <summary>
+        /// A controller that deletes franchise from database
+        /// </summary>
+        /// <param name="id">Id of franchise to be deleted</param>
+        /// <returns>Deleting report</returns>
         [HttpDelete]
         [Route("deletefranchise")]
-        public async Task<IActionResult> DeleteFranchise([FromQuery] string id)
+        public async Task<IActionResult> DeleteFranchise([FromQuery] int id)
         {
-            bool correctId = int.TryParse(id, out int number);
-            if (correctId)
-            {
-                bool result = await _service.DeleteFranchise(number);
-                if (result)
-                    return Ok($"Franchise, id = {id} was deleted");
-                else
-                    return NotFound();
-            }
+            bool result = await _service.DeleteFranchise(id);
+            if (result)
+                return Ok($"Franchise, id = {id} was deleted");
             else
                 return NotFound();
         }

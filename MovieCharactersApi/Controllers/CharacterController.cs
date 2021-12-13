@@ -25,25 +25,33 @@ namespace MovieCharactersApi.Controllers
             _context = context;
             _mapper = mapper;
         }
-
+        /// <summary>
+        /// A controller that returns character by selected id
+        /// </summary>
+        /// <param name="id">Character id to be shown</param>
+        /// <returns>Character</returns>
         [HttpGet]
         [Route("getcharacter")]
-        public async Task<IActionResult> GetCharacterByIdAsync([FromQuery] string id)
+        public async Task<IActionResult> GetCharacterByIdAsync([FromQuery] int id)
         {
-            bool correctId = int.TryParse(id, out int number);
-            if (correctId)
+            var character = await _service.GetCharacterById(id);
+            if (character != null)
             {
-                var character = await _service.GetCharacterById(number);
                 using (ManualMapping mapping = new ManualMapping(_context, _mapper))
                 {
                     var characterDTO = mapping.MapCharacterToDTO(character);
                     return Ok(characterDTO);
-                }             
+                }
             }
             else
-                return NotFound();
-        }
+                return
+                    NotFound();
 
+        }
+        /// <summary>
+        /// A controller that returns all characters from database
+        /// </summary>
+        /// <returns>All characters</returns>
         [HttpGet]
         [Route("getcharacters")]
         public async Task<IEnumerable<CharacterDTO>> GetCharactersAsync()
@@ -52,7 +60,11 @@ namespace MovieCharactersApi.Controllers
             var characterList = characters.ToList();
             return characterList.Select(x => _mapper.Map<CharacterDTO>(x));           
         }
-
+        /// <summary>
+        /// A controller that create character instance in database
+        /// </summary>
+        /// <param name="characterDTO">Data transfer object representation of character instance </param>
+        /// <returns>Character created report</returns>
         [HttpPost]
         [Route("createcharacter")]
         public async Task<IActionResult> CreateCharacterAsync(CreateCharacterDTO characterDTO)
@@ -65,11 +77,16 @@ namespace MovieCharactersApi.Controllers
             var createdCharacter = await _service.CreateCharacter(character);
 
             if (createdCharacter != null)
-                return CreatedAtAction("GetCharacter", new { id = createdCharacter.Id }, createdCharacter); //responsebody wrong
+                return Ok("Character was created");
             else
                 return NotFound();
         }
 
+        /// <summary>
+        /// A controller that updatdes character in database
+        /// </summary>
+        /// <param name="updateCharacterDTO">Data transfer object representation of character instance </param>
+        /// <returns>Updating report</returns>
         [HttpPut]
         [Route("updatecharacter")]
         public async Task<IActionResult> UpdateCharacterAsync(UpdateCharacterDTO updateCharacterDTO)
@@ -106,22 +123,20 @@ namespace MovieCharactersApi.Controllers
             }
             return Ok();
         }
-
+        /// <summary>
+        /// A controller that deletes character from database
+        /// </summary>
+        /// <param name="id">Id of character to be deleted</param>
+        /// <returns>Deleting report</returns>
         [HttpDelete]
         [Route("deletecharacter")]
-        public async Task<IActionResult> DeleteCharacterAsync([FromQuery] string id)
+        public async Task<IActionResult> DeleteCharacterAsync([FromQuery] int id)
         {
-            bool correctId = int.TryParse(id, out int number);
-            if (correctId)
-            {
-                bool result = await _service.DeleteCharacter(number);
+                bool result = await _service.DeleteCharacter(id);
                 if (result)
                     return Ok($"Character, id = {id} was deleted");
                 else
                     return NotFound();
-            }
-            else
-                return NotFound();
         }
 
     }

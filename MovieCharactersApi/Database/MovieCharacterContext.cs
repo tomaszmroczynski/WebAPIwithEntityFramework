@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace MovieCharactersApi.Database
 {
+    /// <summary>
+    /// A class taht represents structure of database
+    /// </summary>
     public class MovieCharacterContext : DbContext
     {
         public MovieCharacterContext(DbContextOptions options) : base(options) { }
@@ -18,7 +21,10 @@ namespace MovieCharactersApi.Database
         public DbSet<Movie> Movies { get; set; }
 
         public DbSet<Franchise> Franchises { get; set; }
-
+        /// <summary>
+        /// A method that specifies some behavior of databese like automatic id assigment,
+        ///  and generates relation many to many or one to many between tables
+        /// </summary>
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<Character>().Property(x => x.Id).ValueGeneratedOnAdd();

@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace MovieCharactersApi.MappingProfiles
 {
+    /// <summary>
+    /// A class hat contains all neccessary manual DTO mapping methods
+    /// </summary>
     public class ManualMapping : IDisposable
     {
         private  MovieCharacterContext _context;

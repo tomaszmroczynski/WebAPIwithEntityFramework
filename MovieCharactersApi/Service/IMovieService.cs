@@ -7,10 +7,15 @@ using System.Threading.Tasks;
 
 namespace MovieCharactersApi.Service
 {
+    /// <summary>
+    /// An interface containing all MovieService methods for implemetation
+    /// </summary>
     public interface IMovieService
     {
         Task SeedData();
         Task<IEnumerable<Character>> GetCharacters();
+        Task<IEnumerable<Character>> GetCharactersInMovie(int movieId);        
+        Task<IEnumerable<Movie>> GetMoviesInFranchise(int franchiseId);
         Task<IEnumerable<Movie>> GetMovies();
         Task<IEnumerable<Franchise>> GetFranchises();
         Task<Character> GetCharacterById(int id);
@@ -25,9 +30,9 @@ namespace MovieCharactersApi.Service
         Task<Movie> UpdateMovie(Movie movie);
         Task<Franchise> UpdateFranchise(Franchise franchise);
 
-        Task<string> UpdateCharactersInMovie(int movieId, int[] charactersId);
+        Task<Movie> UpdateCharactersInMovie(int movieId, int[] characterIds);
 
-        Task<string> UpdateMovieInFranchise(int franchiseId, int[] moviesId);
+        Task<Franchise> UpdateMoviesInFranchise(int franchiseId, int[] movieId);
         Task<bool> DeleteCharacter(int id);
         Task<bool> DeleteMovie(int id);
         Task<bool> DeleteFranchise(int id);

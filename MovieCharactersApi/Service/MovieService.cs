@@ -10,17 +10,25 @@ using System.Threading.Tasks;
 
 namespace MovieCharactersApi.Service
 {
+    /// <summary>
+    /// A service containing all CRUD methods for character , franchise, movie database models
+    /// </summary>
     public class MovieService : IMovieService
     {
         
         private readonly MovieCharacterContext _context;
-        private readonly IMapper _mapper;
 
-        public MovieService(MovieCharacterContext context, IMapper mapper)
+
+        public MovieService(MovieCharacterContext context)
         {
             _context = context;
-            _mapper = mapper;
+
         }
+        /// <summary>
+        /// A service method that creates character in database
+        /// </summary>
+        /// <param name="character">Character instance</param>
+        /// <returns>Created character</returns>
         public async Task<Character> CreateCharacter(Character character)
         {
             try
@@ -34,7 +42,11 @@ namespace MovieCharactersApi.Service
                 return null;
             }          
         }
-
+        /// <summary>
+        /// A service method that creates movie in database
+        /// </summary>
+        /// <param name="movie">Movie instance</param>
+        /// <returns>Created movie</returns>
         public async Task<Movie> CreateMovie(Movie movie)
         {
             try
@@ -48,12 +60,15 @@ namespace MovieCharactersApi.Service
                 return null;
             }
         }
-
+        /// <summary>
+        /// A service method that creates franchise in database
+        /// </summary>
+        /// <param name="franchise">Franchise instance</param>
+        /// <returns>Created franchise</returns>
         public async Task<Franchise> CreateFranchise(Franchise franchise)
         {
             try
-            {
-  
+            {  
                 await _context.AddAsync(franchise);
                 await _context.SaveChangesAsync();
                 return franchise;
@@ -64,6 +79,11 @@ namespace MovieCharactersApi.Service
             }
         }
 
+        /// <summary>
+        /// A service method that deletes character from database
+        /// </summary>
+        /// <param name="id">An id of character to be deleted</param>
+        /// <returns>Boolean result of action</returns>
         public async Task<bool> DeleteCharacter(int id)
         {
             var character = await _context.Characters.SingleOrDefaultAsync(c => c.Id == id);
@@ -74,10 +94,13 @@ namespace MovieCharactersApi.Service
                 return true;
             }
             else
-                return false;
-            
+                return false;           
         }
-
+        /// <summary>
+        /// A service method that deletes movie from database
+        /// </summary>
+        /// <param name="id">An id of movie to be deleted</param>
+        /// <returns>Boolean result of action</returns>
         public async Task<bool> DeleteMovie(int id)
         {
             var movie = await _context.Movies.SingleOrDefaultAsync(c => c.Id == id);
@@ -89,9 +112,12 @@ namespace MovieCharactersApi.Service
             }
             else
                 return false;
-
         }
-
+        /// <summary>
+        /// A service method that deletes franchise from database
+        /// </summary>
+        /// <param name="id">An id of franchise to be deleted</param>
+        /// <returns>Boolean result of action</returns>
         public async Task<bool> DeleteFranchise(int id)
         {
             var franchise = await _context.Franchises.SingleOrDefaultAsync(c => c.Id == id);
@@ -103,45 +129,87 @@ namespace MovieCharactersApi.Service
             }
             else
                 return false;
-
         }
-
+        /// <summary>
+        /// A service method that show selected character from database
+        /// </summary>
+        /// <param name="id">Id of selected character</param>
+        /// <returns>Selected character</returns>
         public async Task<Character> GetCharacterById(int id)
         {
             return await _context.Characters.Include(c => c.MovieList).FirstOrDefaultAsync(c => c.Id == id);          
         }
-
+        /// <summary>
+        /// A service method that show selected movie from database
+        /// </summary>
+        /// <param name="id">Id of selected movie</param>
+        /// <returns>Selected movie</returns>
         public async Task<Movie> GetMovieById(int id)
         {
-            return await _context.Movies.Include(c => c.CharacterList).FirstOrDefaultAsync(c => c.Id == id);
-            
+            return await _context.Movies.Include(c => c.CharacterList).FirstOrDefaultAsync(c => c.Id == id);           
         }
-
+        /// <summary>
+        /// A service method that show selected franchise from database
+        /// </summary>
+        /// <param name="id">Id of selected franchise</param>
+        /// <returns>Selected franchise</returns>
         public async Task<Franchise> GetFranchiseById(int id)
         {
             return await _context.Franchises.Include(c => c.MovieList).FirstOrDefaultAsync(c => c.Id == id);
          
         }
-
-
+        /// <summary>
+        /// A service method that show all characters from database
+        /// </summary>
+        /// <returns>All characters/returns>
         public async Task<IEnumerable<Character>> GetCharacters()
         {
             return await _context.Characters.Include(c => c.MovieList).ToListAsync();               
         }
+        /// <summary>
+        /// A service method that show all characters from selected movie
+        /// </summary>
+        /// <param name="id">Id of selected movie</param>
+        /// <returns>All characters in selected movie/returns>
+        public async Task<IEnumerable<Character>> GetCharactersInMovie(int movieId)
+        {
+            var moviesWithCharacters = await _context.Movies.Include(c => c.CharacterList).ToListAsync();
+            var foundMovie = moviesWithCharacters.FirstOrDefault(x => x.Id == movieId);           
+            return foundMovie.CharacterList;
+        }
+        /// <summary>
+        /// A service method that show all movies from selected franchise
+        /// </summary>
+        /// <param name="id">Id of selected franchise</param>
+        /// <returns>All characters in selected franchise/returns>
+        public async Task<IEnumerable<Movie>> GetMoviesInFranchise(int franchiseId)
+        {          
+            var franchiseWithMovies = await _context.Franchises.Include(c => c.MovieList).ToListAsync();
+            var foundfranchise = franchiseWithMovies.FirstOrDefault(x => x.Id == franchiseId);
+            return foundfranchise.MovieList;
+        }
 
+        /// <summary>
+        /// A service method that show all movies in database
+        /// </summary>
+        /// <returns>All movies</returns>
         public async Task<IEnumerable<Movie>> GetMovies()
         {
             return await _context.Movies.Include(c => c.CharacterList).ToListAsync();
         }
+        /// <summary>
+        /// A service method that show all franchises in database
+        /// </summary>
+        /// <returns>All franchises</returns>
         public async Task<IEnumerable<Franchise>> GetFranchises()
         {
-            return await _context.Franchises.Include(c => c.MovieList).ToListAsync();
-          
+            return await _context.Franchises.Include(c => c.MovieList).ToListAsync();          
         }
-
+        /// <summary>
+        /// A service method that seeds data for first time
+        /// </summary>
         public async Task SeedData()
-        {
-            
+        {           
             var characters = CreateStartCharacters();
             var movies = CreateMovies();
             var franchises = CreateFranchises();           
@@ -150,7 +218,11 @@ namespace MovieCharactersApi.Service
             await _context.Franchises.AddRangeAsync(franchises);
             await _context.SaveChangesAsync();
         }
-
+        /// <summary>
+        /// A service method that updates character in database
+        /// </summary>
+        /// <param name="character">New character parameters</param>
+        /// <returns>Updated character</returns>
         public async Task<Character> UpdateCharacter(Character character)
         {
             var characterFound = await _context.Characters.SingleOrDefaultAsync(c => c.Id == character.Id);
@@ -168,52 +240,11 @@ namespace MovieCharactersApi.Service
             else
                 return null;
         }
-
-        public async Task<string> UpdateCharactersInMovie(int movieId, int[] charactersId)
-        {
-            
-            var movie = await _context.Movies.FirstOrDefaultAsync(c => c.Id == movieId);
-            if (movie != null)
-            {
-                Character character = new Character();
-                foreach (var item in charactersId)
-                {
-                    character = await _context.Characters.FirstOrDefaultAsync(c => c.Id == item);
-                    if (!movie.CharacterList.Contains(character))
-                    {
-                        movie.CharacterList.Add(character);                       
-                    }
-                }
-                return "characters was updated succesfully";
-            } 
-            else
-            {
-                return "incorrect movie id";
-            }
-        }
-
-        public async Task<string> UpdateMovieInFranchise(int franchiseId, int[] moviesId)
-        {
-            var franchise = await _context.Franchises.FirstOrDefaultAsync(c => c.Id == franchiseId);
-            if (franchise != null)
-            {
-                Movie movie = new Movie();
-                foreach (var item in moviesId)
-                {
-                    movie = await _context.Movies.FirstOrDefaultAsync(c => c.Id == item);
-                    if (!franchise.MovieList.Contains(movie))
-                    {
-                        franchise.MovieList.Add(movie);
-                    }
-                }
-                return "movies in franchise was updated succesfully";
-            }
-            else
-            {
-                return "incorrect franchise id";
-            }
-        }
-
+        /// <summary>
+        /// A service method that updates movie in database
+        /// </summary>
+        /// <param name="movie">New movie parameters</param>
+        /// <returns>Updated movie</returns>
         public async Task<Movie> UpdateMovie(Movie movie)
         {
             var movieFound = await _context.Movies.SingleOrDefaultAsync(c => c.Id == movie.Id);
@@ -231,7 +262,67 @@ namespace MovieCharactersApi.Service
             else
                 return null;
         }
-
+        /// <summary>
+        /// A service method that updates characters in selected movie
+        /// </summary>
+        /// <param name="movieId">Selected movie id</param>
+        /// <param name="characterIds">Array of  character ids for updating</param>
+        /// <returns>Updated movie</returns>
+        public async Task<Movie> UpdateCharactersInMovie(int movieId, int[]characterIds)
+        {    
+            var movieFound = await _context.Movies.Include(m => m.CharacterList).SingleOrDefaultAsync(c => c.Id == movieId);
+            if (movieFound != null)
+            {
+                movieFound.CharacterList.Clear();
+                foreach (var item in characterIds)
+                {
+                    var character = await _context.Characters.FirstOrDefaultAsync(x => x.Id == item);
+                    if (character != null)
+                    {
+                        movieFound.CharacterList.Add(character);
+                    }
+                    else
+                        continue;
+                }              
+                await _context.SaveChangesAsync();
+                return movieFound;
+            }
+            else
+                return null;
+        }
+        /// <summary>
+        /// A service method that updates movies in selected franchise
+        /// </summary>
+        /// <param name="franchiseId">Selected franchise id</param>
+        /// <param name="movieIds">An array of movie Id for updating</param>
+        /// <returns>Updated franchise</returns>
+        public async Task<Franchise> UpdateMoviesInFranchise(int franchiseId, int[] movieIds)
+        {
+            var franchiseFound = await _context.Franchises.Include(m => m.MovieList).SingleOrDefaultAsync(c => c.Id == franchiseId);
+            if (franchiseFound != null)
+            {
+                franchiseFound.MovieList.Clear();
+                foreach (var item in movieIds)
+                {
+                    var movie = await _context.Movies.FirstOrDefaultAsync(x => x.Id == item);
+                    if (movie != null)
+                    {
+                        franchiseFound.MovieList.Add(movie);
+                    }
+                    else
+                        continue;
+                }
+                await _context.SaveChangesAsync();
+                return franchiseFound;
+            }
+            else
+                return null;
+        }
+        /// <summary>
+        /// A service methods that updates franchise
+        /// </summary>
+        /// <param name="franchise">Selected franchise</param>
+        /// <returns>Updated franchise</returns>
         public async Task<Franchise> UpdateFranchise(Franchise franchise)
         {
             var franchiseFound = await _context.Franchises.SingleOrDefaultAsync(c => c.Id == franchise.Id);
@@ -246,7 +337,9 @@ namespace MovieCharactersApi.Service
             else
                 return null;
         }
-
+        /// <summary>
+        /// A private method for first time characters seed to database
+        /// </summary>
         private ICollection<Character> CreateStartCharacters() 
         {
             return new List<Character>
@@ -277,6 +370,9 @@ namespace MovieCharactersApi.Service
                 }
             };
         }
+        /// <summary>
+        /// A private method for first time franchises seed to database
+        /// </summary>
         private ICollection<Franchise> CreateFranchises()
         {
             return new List<Franchise>
@@ -298,6 +394,9 @@ namespace MovieCharactersApi.Service
                 }
             };       
         }
+        /// <summary>
+        /// A private method for first time movies seed to database
+        /// </summary>
         private ICollection<Movie> CreateMovies()
         {
             return new List<Movie>
@@ -330,6 +429,6 @@ namespace MovieCharactersApi.Service
                     Trailer = "https://www.youtube.com/watch?v=TYMMOjBUPMM"
                 }
             };
-        }     
+        }
     }
 }

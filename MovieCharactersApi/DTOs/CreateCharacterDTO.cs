@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace MovieCharactersApi.DTOs
 {
+    /// <summary>
+    /// Data transfer object repersentation of Character  instance used to create character in database
+    /// </summary>
     public class CreateCharacterDTO
     {
         public string FullName { get; set; }

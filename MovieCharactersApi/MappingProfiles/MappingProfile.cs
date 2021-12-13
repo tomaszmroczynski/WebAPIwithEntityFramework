@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace MovieCharactersApi.MappingProfiles
 {
+    /// <summary>
+    /// A classs that contains automatic mapping profiles
+    /// </summary>
     public class MappingProfile : Profile
     {
         public MappingProfile()

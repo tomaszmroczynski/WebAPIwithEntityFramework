@@ -27,7 +27,10 @@ namespace MovieCharactersApi.Controllers
             _mapper = mapper;
             _context = context;
         }
-
+        /// <summary>
+        /// A controller that returns all movies in database
+        /// </summary>
+        /// <returns>All movies</returns>
         [HttpGet]
         [Route("getmovies")]
         public async Task<IEnumerable<MovieDTO>> GetMovies()
@@ -35,17 +38,19 @@ namespace MovieCharactersApi.Controllers
             var movies = await _service.GetMovies();
             var movieList = movies.ToList();
             return movieList.Select(x => _mapper.Map<MovieDTO>(x));
-
         }
-
+        /// <summary>
+        /// A controller that returns movie by selected id
+        /// </summary>
+        /// <param name="id">Movie id to be shown</param>
+        /// <returns>Movie</returns>
         [HttpGet]
         [Route("getmoviebyid")]
-        public async Task<IActionResult> GetMovieAsync([FromQuery] string id)
+        public async Task<IActionResult> GetMovieAsync([FromQuery] int id)
         {
-            bool correctId = int.TryParse(id, out int number);
-            if (correctId)
+                var movie = await _service.GetMovieById(id);
+            if (movie != null)
             {
-                var movie = await _service.GetMovieById(number);
                 using (ManualMapping mapping = new ManualMapping(_context, _mapper))
                 {
                     var MovieDTO = mapping.MapMovieToDTO(movie);
@@ -54,25 +59,34 @@ namespace MovieCharactersApi.Controllers
             }
             else
                 return NotFound();
-        }
 
-        [HttpPut]
+        }
+        /// <summary>
+        /// A controller that create movie instance in database
+        /// </summary>
+        /// <param name="createMovieDTO">Data transfer object representation of movie instance </param>
+        /// <returns>Movie created report</returns>
+        [HttpPost]
         [Route("createmovie")]
-        public async Task<IActionResult> CreateMovieDTO(CreateMovieDTO createMovieDTO)
+        public async Task<IActionResult> CreateMovie(CreateMovieDTO createMovieDTO)
         {
+           
             using (ManualMapping mapping = new ManualMapping(_context, _mapper))
             {
                 var movie = mapping.MapDTOtoMovie(createMovieDTO);
                 var createdMovie = await _service.CreateMovie(movie);
                 if (createdMovie != null)
-                    return Created(new Uri($"{Request.Path}/{createdMovie.Id}"), createdMovie);
+                    return Ok("Movie was created");
                 else
                     return NotFound();
             }
-
         }
-
-        [HttpPost]
+        /// <summary>
+        /// A controller that updatdes movie in database
+        /// </summary>
+        /// <param name="updateMovieDTO">Data transfer object representation of movie instance </param>
+        /// <returns>Updating report</returns>
+        [HttpPut]
         [Route("updatemovie")]
         public async Task<IActionResult> UpdateMovieAsync(UpdateMovieDTO updateMovieDTO)
         {
@@ -111,22 +125,20 @@ namespace MovieCharactersApi.Controllers
             return Ok();
         }
 
-
+        /// <summary>
+        /// A controller that deletes movie from database
+        /// </summary>
+        /// <param name="id">Id of movie to be deleted</param>
+        /// <returns>Deleting report</returns>
         [HttpDelete]
         [Route("deletemovie")]
-        public async Task<IActionResult> DeleteMovie([FromQuery] string id)
+        public async Task<IActionResult> DeleteMovie([FromQuery] int id)
         {
-            bool correctId = int.TryParse(id, out int number);
-            if (correctId)
-            {
-                bool result = await _service.DeleteMovie(number);
+                bool result = await _service.DeleteMovie(id);
                 if (result)
                     return Ok($"Movie, id = {id} was deleted");
                 else
                     return NotFound();
-            }
-            else
-                return NotFound();
         }
 
     }

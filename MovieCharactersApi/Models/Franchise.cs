@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace MovieCharactersApi.Models
 {
+    /// <summary>
+    /// A class that contains franchise database model
+    /// </summary>
     public class Franchise
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]

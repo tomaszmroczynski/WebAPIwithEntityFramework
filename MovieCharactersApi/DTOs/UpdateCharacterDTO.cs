@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace MovieCharactersApi.DTOs
 {
+    /// <summary>
+    /// Data transfer object repersentation of Character  instance used to update character in database
+    /// </summary>
     public class UpdateCharacterDTO
     {
         public int Id { get; set; }
