@@ -2,7 +2,7 @@
 
 namespace MovieCharactersApi.Migrations
 {
-    public partial class createDb : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
